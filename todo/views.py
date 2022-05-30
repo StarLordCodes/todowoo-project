@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
 
 
 def home(request):
@@ -6,7 +8,7 @@ def home(request):
 
 
 def signupuser(request):
-    pass
+    return render(request, "todo/signupuser.html", {"form": UserCreationForm, "page_name": "Signup page"})
 
 
 def loginuser(request):
