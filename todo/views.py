@@ -1,8 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.db import IntegrityError
+from django.contrib.auth import login, logout, authenticate
 
 
 def home(request):
@@ -28,14 +29,21 @@ def signupuser(request):
             if request.POST['password1'] == request.POST['password2']:
                 user = User.objects.create_user(request.POST['username'], password=request.POST['password1'])
                 user.save()
+                login(request, user)
+                return redirect ('currentodos')
             else:
                 return render(request, "todo/signupuser.html",
-                              {"form": UserCreationForm, "error_message": "Passwords do not match"})
+                              {"form": UserCreationForm, "error_message": "Passwords do not match",
+                               "page_name": "Passwords do not match"})
         except IntegrityError:
             return render(request, "todo/signupuser.html",
                           {"form": UserCreationForm,
-                           "error_message": "Username already taken please use another username"})
+                           "error_message": "Username already taken please use another username",
+                           "page_name": "Username invalid"})
 
 
 def loginuser(request):
     pass
+
+def currenttodos(request):
+    return render(request, 'todo/currenttodos.html', {'page_name': 'Current Todos'})
