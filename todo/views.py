@@ -45,5 +45,12 @@ def signupuser(request):
 def loginuser(request):
     pass
 
+def logoutuser(request):
+    #checking if the request is post not get. important. browsers tend to preload links so
+    #important to set as post not get
+    if request.method == 'POST':
+        logout(request)
+        return redirect('home')
+
 def currenttodos(request):
     return render(request, 'todo/currenttodos.html', {'page_name': 'Current Todos'})

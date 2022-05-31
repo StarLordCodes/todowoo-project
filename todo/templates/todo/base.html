@@ -5,6 +5,21 @@
     <title>{{ page_name }}</title>
 </head>
 <body>
+{% if user.is_authenticated %}
+    <h4>Logged in as {{ user.username }}</h4>
+<!--    we have to use a form here instead of an a tag for logout because we need to return-->
+<!--    a post method.-->
+    <form action="{% url 'logoutuser' %}" method="POST">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
+{% else %}
+    <button><a href="{%url 'signupuser' %}">  Signup  </a></button>
+    <button><a href="{%url 'loginuser' %}">  Login  </a></button>
+{% endif %}
+
+<br>
+<br>
 {% block content %}
 {% endblock %}
 
