@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.contrib.auth import login, logout, authenticate
@@ -43,7 +43,19 @@ def signupuser(request):
 
 
 def loginuser(request):
-    pass
+    if request.method == 'GET':
+        return render(request, 'todo/loginuser.html', {"form":AuthenticationForm})
+    else:
+        user = authenticate(request,
+                            username=request.POST['username'],
+                            password=request.POST['password'])
+        if user is None:
+            return render(request, 'todo/loginuser.html', {"form": UserCreationForm,
+                                                       "error_message": "Incorrect password username combination"})
+        else:
+            login(request,user)
+            return redirect('currenttodos')
+
 
 def logoutuser(request):
     #checking if the request is post not get. important. browsers tend to preload links so
