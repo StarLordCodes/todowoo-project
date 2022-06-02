@@ -3,5 +3,15 @@
 {% block content %}
 
 <h1>Current Todos</h1>
-
+<ul>
+<!--cycling through the todos of the user from the dictionary passed todos-->
+    {% for todo in todos %}
+        <li>
+<!--making the important todos bold-->
+            {% if todo.important %}<b>{% endif %}
+                {{ todo.title }}
+            {% if todo.important %}</b>{% endif %}
+        </li>
+    {% endfor %}
+</ul>
 {% endblock %}

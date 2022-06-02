@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.contrib.auth import login, logout, authenticate
 from .forms import TodoForm
-
+from .models import Todo
 
 def home(request):
     return render(request, "todo/home.html", {"page_name": "Home page"})
@@ -66,7 +66,10 @@ def logoutuser(request):
 
 
 def currenttodos(request):
-    return render(request, 'todo/currenttodos.html', {'page_name': 'Current Todos'})
+    # if you use todos = Todo.objects.all() we get the objects of all the users
+    # we only want the todos of the current user, also checking if datecompleted is null
+    todos = Todo.objects.filter(user=request.user, datecompleted__isnull=True)
+    return render(request, 'todo/currenttodos.html', {'page_name': 'Current Todos', 'todos': todos})
 
 
 def createtodo(request):
