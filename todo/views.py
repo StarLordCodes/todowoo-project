@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.contrib.auth import login, logout, authenticate
+from .forms import TodoForm
 
 
 def home(request):
@@ -30,7 +30,7 @@ def signupuser(request):
                 user = User.objects.create_user(request.POST['username'], password=request.POST['password1'])
                 user.save()
                 login(request, user)
-                return redirect ('currentodos')
+                return redirect('currentodos')
             else:
                 return render(request, "todo/signupuser.html",
                               {"form": UserCreationForm, "error_message": "Passwords do not match",
@@ -44,25 +44,45 @@ def signupuser(request):
 
 def loginuser(request):
     if request.method == 'GET':
-        return render(request, 'todo/loginuser.html', {"form":AuthenticationForm})
+        return render(request, 'todo/loginuser.html', {"form": AuthenticationForm})
     else:
         user = authenticate(request,
                             username=request.POST['username'],
                             password=request.POST['password'])
         if user is None:
             return render(request, 'todo/loginuser.html', {"form": UserCreationForm,
-                                                       "error_message": "Incorrect password username combination"})
+                                                           "error_message": "Incorrect password username combination"})
         else:
-            login(request,user)
+            login(request, user)
             return redirect('currenttodos')
 
 
 def logoutuser(request):
-    #checking if the request is post not get. important. browsers tend to preload links so
-    #important to set as post not get
+    # checking if the request is post not get. important. browsers tend to preload links so
+    # important to set as post not get
     if request.method == 'POST':
         logout(request)
         return redirect('home')
 
+
 def currenttodos(request):
     return render(request, 'todo/currenttodos.html', {'page_name': 'Current Todos'})
+
+
+def createtodo(request):
+    # In case of get, just provide a form to create the todo object
+    if request.method == 'GET':
+        return render(request, 'todo/createtodo.html', {'form': TodoForm})
+    else:
+        # In case of an error we might want to print an error message. The error is unlikely
+        # but we have to be prepared
+        try:
+            form = TodoForm(request.POST)
+            # Now save the form without committing it to database
+            newtodo = form.save(commit=False)
+            newtodo.user = request.user
+            newtodo.save()
+            return redirect('currenttodos')
+        except ValueError:
+            return render(request, 'todo/createtodo.html', {'form': TodoForm,
+                                                            'error_message': 'Bad data. Please try again'})
