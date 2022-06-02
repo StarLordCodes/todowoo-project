@@ -3,15 +3,18 @@
 {% block content %}
 
 <h1>Current Todos</h1>
-<ul>
+<ul></ul>
 <!--cycling through the todos of the user from the dictionary passed todos-->
     {% for todo in todos %}
-        <li>
-<!--making the important todos bold-->
-            {% if todo.important %}<b>{% endif %}
-                {{ todo.title }}
-            {% if todo.important %}</b>{% endif %}
-        </li>
+    <!--adding links to the list object-->
+        <a href="{% url 'viewtodo' todo.id %}">
+            <li>
+                <!--making the important todos bold-->
+                {% if todo.important %}<b>{% endif %}
+                    {{ todo.title }}
+                {% if todo.important %}</b>{% endif %}
+            </li>
+        </a>
     {% endfor %}
 </ul>
 {% endblock %}

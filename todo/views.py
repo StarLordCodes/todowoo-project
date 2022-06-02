@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.db import IntegrityError
@@ -89,3 +89,26 @@ def createtodo(request):
         except ValueError:
             return render(request, 'todo/createtodo.html', {'form': TodoForm,
                                                             'error_message': 'Bad data. Please try again'})
+def viewtodo(request, todo_pk):
+    # todo = get_object_or_404(Todo,pk=todo_pk) this allows access to all users so we have to change it to show only
+    # objects of the current user or else show 404 so we add user = request.user too.
+    todo = get_object_or_404(Todo, pk=todo_pk, user=request.user)
+    if request.method == 'GET':
+        # if get method then show the contents of the "todoform". It is easy in django to show the form for the current
+        # object. You just have to pass the object into the form as argument like here. Then pass the form onto the html
+        # view.
+        form = TodoForm(instance=todo)
+        return render(request, 'todo/viewtodo.html', {'form': form, 'todo': todo})
+    else:
+        # again use try except for handling errors
+        try:
+            # take the changed value if the user makes any change and pass it onto the "TodoForm" and then save it for
+            # the instant "todo" which we got at the beginning of the function
+            form = TodoForm(request.POST,instance=todo)
+            form.save()
+            return redirect('currenttodos')
+        except ValueError:
+            return render(request, 'todo/viewtodo.html', {"error_message": "Bad data. Try again",
+                                                          "form": form, "todo": todo})
+
+
