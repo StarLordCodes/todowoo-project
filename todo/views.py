@@ -6,6 +6,8 @@ from django.contrib.auth import login, logout, authenticate
 from .forms import TodoForm
 from .models import Todo
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+
 
 def home(request):
     return render(request, "todo/home.html", {"page_name": "Home page"})
@@ -57,7 +59,7 @@ def loginuser(request):
             login(request, user)
             return redirect('currenttodos')
 
-
+@login_required
 def logoutuser(request):
     # checking if the request is post not get. important. browsers tend to preload links so
     # important to set as post not get
@@ -65,14 +67,21 @@ def logoutuser(request):
         logout(request)
         return redirect('home')
 
-
+@login_required
 def currenttodos(request):
     # if you use todos = Todo.objects.all() we get the objects of all the users
     # we only want the todos of the current user, also checking if datecompleted is null
     todos = Todo.objects.filter(user=request.user, datecompleted__isnull=True)
     return render(request, 'todo/currenttodos.html', {'page_name': 'Current Todos', 'todos': todos})
 
+@login_required
+# last function created , to see all the completed todos extremely similar to currenttodos
+def completedtodos(request):
+    todos = Todo.objects.filter(user=request.user, datecompleted__isnull=False)
+    return render(request, 'todo/completedtodos.html', {'todos': todos, 'page_name': 'Completed Todos'})
 
+
+@login_required
 def createtodo(request):
     # In case of get, just provide a form to create the todo object
     if request.method == 'GET':
@@ -90,6 +99,9 @@ def createtodo(request):
         except ValueError:
             return render(request, 'todo/createtodo.html', {'form': TodoForm,
                                                             'error_message': 'Bad data. Please try again'})
+
+
+@login_required
 def viewtodo(request, todo_pk):
     # todo = get_object_or_404(Todo,pk=todo_pk) this allows access to all users so we have to change it to show only
     # objects of the current user or else show 404 so we add user = request.user too.
@@ -113,6 +125,7 @@ def viewtodo(request, todo_pk):
                                                           "form": form, "todo": todo})
 
 
+@login_required
 def completetodo(request, todo_pk):
     # getting the required object only
     todo = get_object_or_404(Todo, pk=todo_pk, user=request.user)
@@ -121,6 +134,8 @@ def completetodo(request, todo_pk):
         todo.save()
         return redirect('currenttodos')
 
+
+@login_required
 def deletetodo(request, todo_pk):
     # getting the required object only
     todo = get_object_or_404(Todo, pk=todo_pk, user=request.user)

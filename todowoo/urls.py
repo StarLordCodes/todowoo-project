@@ -27,6 +27,7 @@ urlpatterns = [
     path('createtodo/', views.createtodo, name='createtodo'),
     path('viewtodo/<int:todo_pk>', views.viewtodo, name='viewtodo'),
     path('viewtodo/<int:todo_pk>/complete', views.completetodo, name='completetodo'),
-    path('viewtodo/<int:todo_pk>/delete', views.deletetodo, name='deletetodo')
+    path('viewtodo/<int:todo_pk>/delete', views.deletetodo, name='deletetodo'),
+    path('completedtodos', views.completedtodos, name='completedtodos')
 
 ]

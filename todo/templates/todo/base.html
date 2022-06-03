@@ -7,6 +7,11 @@
 <body>
 {% if user.is_authenticated %}
     <h4>Logged in as {{ user.username }}</h4>
+<!--adding links to create todo, view current and completed todos in the last step-->
+    <a href="{% url 'createtodo' %}"> Create |</a>
+    <a href="{% url 'currenttodos' %}"> Current Todos |</a>
+    <a href="{% url 'completedtodos' %}"> Completed Todos |</a>
+
 <!--    we have to use a form here instead of an a tag for logout because we need to return-->
 <!--    a post method.-->
     <form action="{% url 'logoutuser' %}" method="POST">
