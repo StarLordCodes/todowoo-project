@@ -5,6 +5,7 @@ from django.db import IntegrityError
 from django.contrib.auth import login, logout, authenticate
 from .forms import TodoForm
 from .models import Todo
+from django.utils import timezone
 
 def home(request):
     return render(request, "todo/home.html", {"page_name": "Home page"})
@@ -103,7 +104,7 @@ def viewtodo(request, todo_pk):
         # again use try except for handling errors
         try:
             # take the changed value if the user makes any change and pass it onto the "TodoForm" and then save it for
-            # the instant "todo" which we got at the beginning of the function
+            # the instant todo which we got at the beginning of the function
             form = TodoForm(request.POST,instance=todo)
             form.save()
             return redirect('currenttodos')
@@ -111,4 +112,19 @@ def viewtodo(request, todo_pk):
             return render(request, 'todo/viewtodo.html', {"error_message": "Bad data. Try again",
                                                           "form": form, "todo": todo})
 
+
+def completetodo(request, todo_pk):
+    # getting the required object only
+    todo = get_object_or_404(Todo, pk=todo_pk, user=request.user)
+    if request.method == 'POST':
+        todo.datecompleted = timezone.now()
+        todo.save()
+        return redirect('currenttodos')
+
+def deletetodo(request, todo_pk):
+    # getting the required object only
+    todo = get_object_or_404(Todo, pk=todo_pk, user=request.user)
+    if request.method == 'POST':
+        todo.delete()
+        return redirect('currenttodos')
 

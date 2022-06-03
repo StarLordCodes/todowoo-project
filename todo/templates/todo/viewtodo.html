@@ -4,9 +4,20 @@
    <h4>{{ error_message }}</h4>
  {% endif %}
  {{ todo.title }}
+
  <form method="POST">
    {% csrf_token %}
    {{ form.as_p }}
-   <button type="submit"> Update! </button>
+   <button type="submit"> Update Todo! </button>
  </form>
- {% endblock %}
+
+ <form method="POST" action="{% url 'completetodo' todo.id %}">
+    {% csrf_token %}
+     <button type="submit"> Todo Completed! </button>
+ </form>
+
+ <form method="POST" action="{% url 'deletetodo' todo.id %}">
+     {% csrf_token %}
+     <button type="submit">Delete this todo!</button>
+ </form>
+{% endblock %}
